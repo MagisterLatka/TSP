@@ -21,22 +21,23 @@ int main()
 		return 1;
 	}
 
-	for (int i = 0; i < n; ++i)
+	for (int i = 1; i <= n; ++i)
 	{
+		int tmp;
 		/* std::cout << "Podaj wspolrzedne punktu: "; */
-		std::cin >> pos[i].first >> pos[i].second;
+		std::cin >> tmp >> pos[i].first >> pos[i].second;
 	}
-	for (int i = 0; i < n; ++i)
+	for (int i = 1; i <= n; ++i)
 	{
-		for (int j = 0; j < n; ++j)
+		for (int j = 1; j <= n; ++j)
 		{
 			dist[i][j] = sqrt(pow(pos[i].first - pos[j].first, 2.0) + pow(pos[i].second - pos[j].second, 2.0));
 		}
 	}
 
 	/* std::cout << "Podaj indeks startowego wierzcholka: "; */
-	int start;
-	std::cin >> start;
+	int start = 1;
+	//std::cin >> start;
 	visited[start] = true;
 
 	std::vector<int> res;
@@ -48,7 +49,7 @@ int main()
 	{
 		double mini = std::numeric_limits<double>::infinity();
 		int m_poz;
-		for(int i = 0; i < n ; i++){
+		for(int i = 1; i <= n ; i++){
 			if(dist[poz][i] > 0 and dist[poz][i] < mini and !visited[i]){
 				mini = dist[poz][i];
 				m_poz = i;
