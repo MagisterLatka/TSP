@@ -30,7 +30,9 @@ int next_vertex(double prob, int a, bool vis[]){
 			continue;
 		sum += feromone_trail[a][i];
 	}
+	cout << prob << endl;
 	prob = (prob*sum)/99;
+	cout << sum << " " << prob << endl;
 	int vert = 0;
 	while(prob > 0 and vert < n){
 		if(vis[vert]){
@@ -64,8 +66,17 @@ void decerease_feromones(double ev){
 	}
 }
 
+void zero(){
+	for(int i = 0; i < n; i++){
+		for(int k = 0; k < n; k++){
+			feromone_trail[i][k] = 1;
+		}
+	}
+}
+
 int main(){
 	srand(time(NULL));
+	zero();
 	cin >> n;
 	for(int i = 0; i < n; i++){
 		int a, b, idx;
@@ -88,6 +99,7 @@ int main(){
 				int next_vert = next_vertex(next_prob, curr_vert, vis);
 				ord.push_back(next_vert);
 				curr_vert = next_vert;
+				vis[curr_vert] = true;
 			}
 			ord.push_back(start);
 			all_paths.push_back(ord);
