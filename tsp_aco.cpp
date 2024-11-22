@@ -22,17 +22,18 @@ int n;
 double feromone_trail[MX][MX] {};
 double mini_lenght = numeric_limits<double>::infinity();
 vector<int> mini_path;
+int mini_idx;
 
 int next_vertex(double prob, int a, bool vis[]){
-	int sum = 0;
+	double sum = 0;
 	for(int i = 0; i < n; i++){
 		if(vis[i])
 			continue;
 		sum += feromone_trail[a][i];
 	}
-	cout << prob << endl;
+	/* cout << prob << endl; */
 	prob = (prob*sum)/99;
-	cout << sum << " " << prob << endl;
+	/* cout << sum << " " << prob << endl; */
 	int vert = 0;
 	while(prob > 0 and vert < n){
 		if(vis[vert]){
@@ -89,7 +90,7 @@ int main(){
 		vector<vector<int>> all_paths;
 		for(int ant_nb = 0; ant_nb < ant_count; ant_nb++){
 			vector <int> ord;
-			bool vis[MX];
+			bool vis[MX] {};
 			int start = rand()%n;
 			vis[start] = true;
 			ord.push_back(start);
@@ -105,22 +106,31 @@ int main(){
 			all_paths.push_back(ord);
 		}
 		decerease_feromones(evaporation);
+		int n = 0;
 		for(auto path : all_paths){
 			double length = 0;
 			for(int i = 0; i < path.size()-1; i++){
 				length += distance(path[i], path[i+1]);
 			}
+			cout << length << endl;
+			for(int a : path){
+				cout << a << " ";
+			}
+			cout << endl;
 			if(length < mini_lenght){
 				mini_lenght = length;
 				mini_path = path;
+				mini_idx = n;
 			}
 			for(int i = 0; i < path.size()-1; i++){
 				feromone_trail[path[i]][path[i+1]] += (1/length);
 			}
+			n++;
 		}
 
 	}
-
+	
+	cout << mini_idx << endl;
 	cout << mini_lenght << endl;
 	for(int a : mini_path){
 		cout << a+1 << " ";
