@@ -1,3 +1,4 @@
+#include <ios>
 #include <iostream>
 #include <iterator>
 #include <vector>
@@ -14,9 +15,9 @@ typedef tuple<int, int, int> tii;
 vector<tii> points;
 
 const int MX = 100;
-int iterations = 100;
-int ant_count = 100;
-double evaporation = 0.9;
+int iterations = 2000;
+int ant_count = 300;
+double evaporation = 0.8;
 int n;
 
 double feromone_trail[MX][MX] {};
@@ -31,18 +32,25 @@ int next_vertex(double prob, int a, bool vis[]){
 			continue;
 		sum += feromone_trail[a][i];
 	}
-	/* cout << prob << endl; */
-	prob = (prob*sum)/99;
-	/* cout << sum << " " << prob << endl; */
+	/* cout << "sum  " << sum << endl; */
+	/* cout << prob << " "; */
+	prob = (prob*sum)/100.0;
 	int vert = 0;
-	while(prob > 0 and vert < n){
+	/* cout << prob << endl; */
+	while( vert < n){
+		/* cout << "co"; */
 		if(vis[vert]){
 			vert++;
 			continue;
 		}
+		if(prob - feromone_trail[a][vert] < 0)
+			break;
+		/* cout << feromone_trail[a][vert] << " -> "; */
 		prob -= feromone_trail[a][vert];
+		/* cout << prob << " | "; */
 		vert++;
 	}
+	/* cout << vert << endl;; */
 
 	return vert;
 }
@@ -68,14 +76,15 @@ void decerease_feromones(double ev){
 }
 
 void zero(){
-	for(int i = 0; i < n; i++){
-		for(int k = 0; k < n; k++){
+	for(int i = 0; i < MX; i++){
+		for(int k = 0; k < MX; k++){
 			feromone_trail[i][k] = 1;
 		}
 	}
 }
 
 int main(){
+	ios_base::sync_with_stdio(false);
 	srand(time(NULL));
 	zero();
 	cin >> n;
@@ -87,6 +96,7 @@ int main(){
 
 
 	while(iterations --> 0){
+		double avg = 0;
 		vector<vector<int>> all_paths;
 		for(int ant_nb = 0; ant_nb < ant_count; ant_nb++){
 			vector <int> ord;
@@ -112,28 +122,38 @@ int main(){
 			for(int i = 0; i < path.size()-1; i++){
 				length += distance(path[i], path[i+1]);
 			}
-			cout << length << endl;
-			for(int a : path){
-				cout << a << " ";
-			}
-			cout << endl;
+			avg += length;
+			/* cout << length << endl; */
+			/* for(int a : path){ */
+			/* 	cout << a << " "; */
+			/* } */
+			/* cout << endl; */
 			if(length < mini_lenght){
 				mini_lenght = length;
 				mini_path = path;
 				mini_idx = n;
 			}
 			for(int i = 0; i < path.size()-1; i++){
-				feromone_trail[path[i]][path[i+1]] += (1/length);
+				/* cout << (100000/length) << endl; */
+				feromone_trail[path[i]][path[i+1]] += (100000/length);
 			}
 			n++;
 		}
-
+		cout << "--------  " << avg/ant_count << endl;
 	}
 	
 	cout << mini_idx << endl;
 	cout << mini_lenght << endl;
 	for(int a : mini_path){
 		cout << a+1 << " ";
+	}
+
+	cout << endl;
+	for(int i = 0; i < n; i++){
+		for(int k =0; k < n; k++){
+			cout << feromone_trail[i][k] << " ";
+		}
+		cout << endl;
 	}
 
 }
