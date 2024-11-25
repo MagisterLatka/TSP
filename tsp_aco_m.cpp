@@ -4,6 +4,7 @@
 #include <random>
 #include <climits>
 #include <cfloat>
+#include <chrono>
 
 struct ConnectionData {
 	double length;
@@ -16,8 +17,8 @@ struct AntData {
 	std::vector<bool> visited;
 };
 
-const double c = 5.0, alpha = 1.0, beta = 5.0, decayRatio = 0.5, q = 1000.0;
-const int maxNumberOfCycles = 1000;
+const double c = 5.0, alpha = 1.0, beta = 5.0, decayRatio = 0.5, q = 1000.0, maxTime = 300.0;
+const int maxNumberOfCycles = 1000, stagnationCount = 50;
 std::random_device rd;
 std::mt19937_64 gen(rd());
 std::uniform_real_distribution<> probability(0.0, 1.0);
@@ -50,9 +51,11 @@ int main() {
 		}
 	}
 
-	int numberOfCycles = maxNumberOfCycles;
-	double shortestTour = DBL_MAX;
-	while (numberOfCycles-- > 0) {//&& !stagnation 
+	auto start = std::chrono::high_resolution_clock::now();
+	int numberOfCycles = maxNumberOfCycles, sameResults = 0;
+	double shortestTour = DBL_MAX, timeSpent = 0.0;
+	while (numberOfCycles-- > 0 && sameResults < stagnationCount) {//&& !stagnation
+		bool foundBetter = false;
 		for (int i = 0; i < n; ++i) {
 			ants[i].order.clear();
 			ants[i].order.push_back(i);
@@ -66,7 +69,10 @@ int main() {
 			}
 
 			double tourLength = calcTourLength(data, ants[i].order);
-			shortestTour = std::min(shortestTour, tourLength);
+			if (tourLength < shortestTour) {
+				shortestTour = tourLength;
+				foundBetter = true;
+			}
 
 			for (int j = 0; j < ants[i].order.size() - 1; ++j) {
 				data[ants[i].order[j]][ants[i].order[j + 1]].deltaIntensity += q / tourLength;
@@ -75,14 +81,26 @@ int main() {
 			data[ants[i].order.back()][ants[i].order.front()].deltaIntensity += q / tourLength;
 			data[ants[i].order.front()][ants[i].order.back()].deltaIntensity += q / tourLength;
 		}
+		if (!foundBetter) {
+			++sameResults;
+		}
+		else
+			sameResults = 0;
+
 		for (int i = 0; i < n; ++i) {
 			for (int j = 0; j < n; ++j) {
 				data[i][j].intensity = data[i][j].intensity * decayRatio + data[i][j].deltaIntensity;
 				data[i][j].deltaIntensity = 0.0;
 			}
 		}
+
+		auto stop = std::chrono::high_resolution_clock::now();
+		timeSpent = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
+		if (timeSpent > maxTime * 1000.0) {
+			break;
+		}
 	}
-	std::cout << shortestTour << std::endl;
+	std::cout << "Shortest tour found: " << shortestTour << " in time " << (timeSpent / 1000.0) << std::endl;
 }
 double getLength(const std::pair<int, int>& a, const std::pair<int, int>& b) {
 	return std::pow(std::pow((double)a.first - (double)b.first, 2.0) + std::pow((double)a.second - (double)b.second, 2.0), 0.5);
