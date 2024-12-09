@@ -17,7 +17,7 @@ struct AntData {
 	std::vector<bool> visited;
 };
 
-const double c = 5.0, alpha = 1.0, beta = 5.0, decayRatio = 0.5, q = 1000.0, maxTime = 300.0;
+const double c = 5.0, alpha = 1.0, beta = 5.0, decayRatio = 0.5, q = 1000.0, maxTime = 180.0;
 const int maxNumberOfCycles = 1000, stagnationCount = 50;
 std::random_device rd;
 std::mt19937_64 gen(rd());
