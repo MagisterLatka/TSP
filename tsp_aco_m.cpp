@@ -54,7 +54,8 @@ int main() {
 	auto start = std::chrono::high_resolution_clock::now();
 	int numberOfCycles = maxNumberOfCycles, sameResults = 0;
 	double shortestTour = DBL_MAX, timeSpent = 0.0;
-	while (numberOfCycles-- > 0 && sameResults < stagnationCount) {//&& !stagnation
+	//std::vector<int> best;
+	while (numberOfCycles-- > 0 && sameResults < stagnationCount) {
 		bool foundBetter = false;
 		for (int i = 0; i < n; ++i) {
 			ants[i].order.clear();
@@ -64,6 +65,16 @@ int main() {
 
 			for (int j = 0; j < n - 1; ++j) {
 				int nextPoint = findNextPoint(data,	ants, n, i, ants[i].order.back());
+				if (nextPoint == -1)
+				{
+					std::cout << "Error" << std::endl;
+					std::cout << "Current ant: " << i << std::endl;
+					std::cout << "Current path: ";
+					for (auto point : ants[i].order) {
+						std::cout << point << " ";
+					}
+					std::cout << std::endl;
+				}
 				ants[i].visited[nextPoint] = true;
 				ants[i].order.push_back(nextPoint);
 			}
@@ -72,6 +83,7 @@ int main() {
 			if (tourLength < shortestTour) {
 				shortestTour = tourLength;
 				foundBetter = true;
+				//best = ants[i].order;
 			}
 
 			for (int j = 0; j < ants[i].order.size() - 1; ++j) {
@@ -94,13 +106,37 @@ int main() {
 			}
 		}
 
+//		std::cout << std::fixed << std::setprecision(3);
+//		if (numberOfCycles == maxNumberOfCycles - 1 || numberOfCycles == maxNumberOfCycles - 2 || numberOfCycles == maxNumberOfCycles - 5) {
+//			std::cout << "------------------------------\n";
+//			for (int i = 0; i < n; ++i) {
+//				for (int j = 0; j < n; ++j) {
+//					std::cout << data[i][j].intensity << ' ';
+//				}
+//				std::cout << '\n';
+//			}
+//			std::cout << "------------------------------\n";
+//		}
+
 		auto stop = std::chrono::high_resolution_clock::now();
 		timeSpent = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
 		if (timeSpent > maxTime * 1000.0) {
 			break;
 		}
 	}
+//	std::cout << "------------------------------\n";
+//	for (int i = 0; i < n; ++i) {
+//		for (int j = 0; j < n; ++j) {
+//			std::cout << data[i][j].intensity << ' ';
+//		}
+//		std::cout << '\n';
+//	}
+//	std::cout << "------------------------------\n";
 	std::cout << "Shortest tour found: " << shortestTour << " in time " << (timeSpent / 1000.0) << std::endl;
+//	for (int i = 0; i < n; ++i) {
+//		std::cout << best[i] << " ";
+//	}
+//	std::cout << '\n';
 }
 double getLength(const std::pair<int, int>& a, const std::pair<int, int>& b) {
 	return std::pow(std::pow((double)a.first - (double)b.first, 2.0) + std::pow((double)a.second - (double)b.second, 2.0), 0.5);

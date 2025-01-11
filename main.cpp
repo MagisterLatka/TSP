@@ -64,14 +64,14 @@ int main()
 	total_dist += dist[poz][start];
 
 	std::cout << "całkowity dystans: " << total_dist << std::endl;
-	std::cout << "kolejność odwiedzania: " << std::endl;
-	for(int a : res){
-		std::cout << a << " ";
-	}
-	std::cout << std::endl;
-	for(int a : res){
-		std::cout << pos[a].first << " " << pos[a].second << ", ";
-	}
+//	std::cout << "kolejność odwiedzania: " << std::endl;
+//	for(int a : res){
+//		std::cout << a << " ";
+//	}
+//	std::cout << std::endl;
+//	for(int a : res){
+//		std::cout << pos[a].first << " " << pos[a].second << ", ";
+//	}
 
 	return 0;
 }
